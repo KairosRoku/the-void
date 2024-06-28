@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class RaycastShoot : MonoBehaviour
 {
@@ -16,7 +18,7 @@ public class RaycastShoot : MonoBehaviour
 
     private float nextTimeToShoot = 0f;
     private Queue<GameObject> marks = new Queue<GameObject>();
-
+    public AssetReferenceGameObject assetreference;
     void Update()
     {
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToShoot)
@@ -97,8 +99,27 @@ public class RaycastShoot : MonoBehaviour
         {
             GameObject oldMark = marks.Dequeue();
             Destroy(oldMark);
-        }
 
-        Destroy(mark, 60f); // Destroy the mark after 60 seconds
+
+
+
+
+            /*  assetreference.LoadAssetAsync<GameObject>().Completed +=
+                  (listener) =>
+                  {
+                      if (listener.Status == AsyncOperationStatus.Succeeded)
+                      {
+                          Debug.Log("completed na");
+                          Instantiate(listener.Result);
+                      }
+                      else
+                      {
+                          Debug.LogError("gago nag error");
+                      }
+                  };
+          }*/
+
+            Destroy(mark, 60f); // Destroy the mark after 60 seconds
+        }
     }
 }

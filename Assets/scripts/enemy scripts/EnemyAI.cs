@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -7,11 +8,15 @@ public class EnemyAI : MonoBehaviour
     public float retreatDistance = 5.0f;
     public float viewAngle = 45.0f;
     public LayerMask playerLayer;
+    public float stunDuration = 20.0f;
+    public float stunCooldown = 2.0f;
 
     private NavMeshAgent agent;
     private Transform player;
     private bool playerInSight;
     private bool playerFound;
+    private bool isStunned;
+    private bool canBeStunned = true;
 
     void Start()
     {
@@ -29,6 +34,7 @@ public class EnemyAI : MonoBehaviour
         {
             player = playerObj.transform;
             playerFound = true;
+            Debug.Log("Player found.");
         }
         else
         {
@@ -38,9 +44,9 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (!playerFound)
+        if (!playerFound || isStunned)
         {
-            return; // Exit Update if player has not been found yet
+            return;
         }
 
         playerInSight = false;
@@ -85,5 +91,35 @@ public class EnemyAI : MonoBehaviour
             Vector3 retreatPosition = transform.position + directionAwayFromPlayer * retreatDistance;
             agent.SetDestination(retreatPosition);
         }
+    }
+
+    public void HitByBullet()
+    {
+        Debug.Log("Enemy hit by bullet.");
+        if (canBeStunned)
+        {
+            StartCoroutine(StunEnemy());
+        }
+    }
+
+    IEnumerator StunEnemy()
+    {
+        isStunned = true;
+        canBeStunned = false;
+        agent.isStopped = true;
+        Debug.Log("Enemy stunned.");
+
+        // Wait for the stun duration
+        yield return new WaitForSeconds(stunDuration);
+
+        isStunned = false;
+        agent.isStopped = false;
+        Debug.Log("Enemy stun duration ended.");
+
+        // Wait for the cooldown before the enemy can be stunned again
+        yield return new WaitForSeconds(stunCooldown);
+
+        canBeStunned = true;
+        Debug.Log("Enemy can be stunned again.");
     }
 }

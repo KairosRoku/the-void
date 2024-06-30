@@ -1,7 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class RaycastShoot : MonoBehaviour
 {
@@ -18,7 +16,7 @@ public class RaycastShoot : MonoBehaviour
 
     private float nextTimeToShoot = 0f;
     private Queue<GameObject> marks = new Queue<GameObject>();
-    public AssetReferenceGameObject assetreference;
+
     void Update()
     {
         if (Input.GetButton("Fire1") && Time.time >= nextTimeToShoot)
@@ -36,6 +34,8 @@ public class RaycastShoot : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(playerCamera.transform.position, shootDirection, out hit, range))
             {
+                Debug.Log("Raycast hit: " + hit.collider.tag);
+
                 if (hit.collider.CompareTag("wall") ||
                     hit.collider.CompareTag("enemy") ||
                     hit.collider.CompareTag("furniture") ||
@@ -43,35 +43,41 @@ public class RaycastShoot : MonoBehaviour
                 {
                     CreateMark(hit.point, hit.normal, hit.collider.tag);
                 }
+
+                if (hit.collider.CompareTag("enemy"))
+                {
+                    Debug.Log("Hit enemy: " + hit.collider.name);
+                    EnemyAI enemyAI = hit.collider.GetComponentInParent<EnemyAI>();
+                    if (enemyAI != null)
+                    {
+                        enemyAI.HitByBullet();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("EnemyAI component not found on hit collider's parent.");
+                    }
+                }
             }
         }
     }
 
     Vector3 GetRandomDirection()
     {
-        // Randomize both azimuth and elevation angles
         float azimuth = Random.Range(-spreadAngle, spreadAngle);
         float elevation = Random.Range(-spreadAngle, spreadAngle);
-
-        // Convert angles to radians
         float azimuthRad = azimuth * Mathf.Deg2Rad;
         float elevationRad = elevation * Mathf.Deg2Rad;
-
-        // Calculate spread direction
         Vector3 direction = new Vector3(
             Mathf.Sin(azimuthRad) * Mathf.Cos(elevationRad),
             Mathf.Sin(elevationRad),
             Mathf.Cos(azimuthRad) * Mathf.Cos(elevationRad)
         );
-
         return playerCamera.transform.TransformDirection(direction.normalized);
     }
 
     void CreateMark(Vector3 position, Vector3 normal, string tag)
     {
         GameObject markPrefab;
-
-        // Select the correct prefab based on the tag
         switch (tag)
         {
             case "wall":
@@ -87,39 +93,17 @@ public class RaycastShoot : MonoBehaviour
                 markPrefab = interactableMarkPrefab;
                 break;
             default:
-                return; // Exit if the tag doesn't match any specified tags
+                return;
         }
 
-        // Instantiate the correct prefab
         GameObject mark = Instantiate(markPrefab, position + normal * 0.01f, Quaternion.LookRotation(normal));
-
-        // Add the mark to the queue and remove the oldest if necessary
         marks.Enqueue(mark);
         if (marks.Count > maxMarks)
         {
             GameObject oldMark = marks.Dequeue();
             Destroy(oldMark);
-
-
-
-
-
-            /*  assetreference.LoadAssetAsync<GameObject>().Completed +=
-                  (listener) =>
-                  {
-                      if (listener.Status == AsyncOperationStatus.Succeeded)
-                      {
-                          Debug.Log("completed na");
-                          Instantiate(listener.Result);
-                      }
-                      else
-                      {
-                          Debug.LogError("gago nag error");
-                      }
-                  };
-          }*/
-
-            Destroy(mark, 60f); // Destroy the mark after 60 seconds
         }
+
+        Destroy(mark, 60f);
     }
 }

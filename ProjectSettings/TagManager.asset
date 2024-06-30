@@ -8,6 +8,7 @@ TagManager:
   - furniture
   - interactable
   - enemy
+  - Bullet
   layers:
   - Default
   - TransparentFX

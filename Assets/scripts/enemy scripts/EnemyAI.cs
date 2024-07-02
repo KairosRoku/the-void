@@ -4,8 +4,6 @@ using System.Collections;
 
 public class EnemyAI : MonoBehaviour
 {
-    public float detectionRange = 10.0f;
-    public float viewAngle = 45.0f;
     public LayerMask playerLayer;
     public float stunDuration = 20.0f;
     public float stunCooldown = 2.0f;
@@ -60,59 +58,7 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        if (IsPlayerInSight())
-        {
-            Debug.Log("Player in sight, chasing...");
-            FollowPlayer();
-        }
-        else
-        {
-            agent.isStopped = true;
-            Debug.Log("Player not in sight, stopping...");
-        }
-    }
-
-    bool IsPlayerInSight()
-    {
-        if (player == null)
-        {
-            Debug.LogWarning("Player reference is null.");
-            return false;
-        }
-
-        Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
-        if (distanceToPlayer <= detectionRange)
-        {
-            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-            if (angleToPlayer <= viewAngle / 2)
-            {
-                RaycastHit hit;
-                if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRange))
-                {
-                    if (hit.collider.CompareTag("Player"))
-                    {
-                        Debug.Log("Player detected by raycast.");
-                        return true;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Raycast hit something else: " + hit.collider.name);
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogWarning("Player is outside of view angle.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Player is out of detection range.");
-        }
-
-        return false;
+        FollowPlayer();
     }
 
     void FollowPlayer()

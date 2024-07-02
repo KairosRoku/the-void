@@ -128,11 +128,6 @@ MonoBehaviour:
   spreadAngle: 10
   fireRate: 0.1
   maxMarks: 10000
-  assetreference:
-    m_AssetGUID: 5a0746b611591e546a6a33981b80f1d6
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
 --- !u!1001 &2222794780418555814
 PrefabInstance:
   m_ObjectHideFlags: 0

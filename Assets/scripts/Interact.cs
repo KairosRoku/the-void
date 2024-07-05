@@ -5,6 +5,7 @@ public class Interact : MonoBehaviour
 {
     public float interactionRange = 3f; // Range within which the player can interact
     public string interactableTag = "Interactable"; // Tag for interactable objects
+    public string gemTag = "gem"; // Tag for gem objects
     public KeyCode interactionKey = KeyCode.E; // Key for interaction
 
     private Camera playerCamera;
@@ -30,7 +31,7 @@ public class Interact : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, interactionRange))
         {
-            if (hit.collider.CompareTag(interactableTag))
+            if (hit.collider.CompareTag(interactableTag) || hit.collider.CompareTag(gemTag))
             {
                 Interactable interactable = hit.collider.GetComponent<Interactable>();
 

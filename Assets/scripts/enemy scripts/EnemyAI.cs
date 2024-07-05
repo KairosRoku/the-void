@@ -9,9 +9,11 @@ public class EnemyAI : MonoBehaviour
     public float stunCooldown = 2.0f;
     public float wanderRadius = 20.0f;
     public float wanderTimer = 5.0f;
+    public AudioClip walkingSound;
 
     private NavMeshAgent agent;
     private Transform player;
+    private AudioSource audioSource;
     private bool playerFound;
     private bool isStunned;
     private bool canBeStunned = true;
@@ -21,6 +23,7 @@ public class EnemyAI : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        audioSource = GetComponent<AudioSource>();
         playerFound = false;
 
         // Delay the search for the player by 1 second
@@ -50,6 +53,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (isStunned || !playerFound)
         {
+            StopWalkingSound();
             return;
         }
 
@@ -67,7 +71,12 @@ public class EnemyAI : MonoBehaviour
         {
             agent.isStopped = false;
             agent.SetDestination(player.position);
+            PlayWalkingSound();
             Debug.Log("Chasing player to position: " + player.position);
+        }
+        else
+        {
+            StopWalkingSound();
         }
     }
 
@@ -98,6 +107,7 @@ public class EnemyAI : MonoBehaviour
             {
                 Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
                 agent.SetDestination(newPos);
+                PlayWalkingSound();
                 Debug.Log("Wandering to position: " + newPos);
                 timer = 0;
             }
@@ -127,6 +137,7 @@ public class EnemyAI : MonoBehaviour
         isStunned = true;
         canBeStunned = false;
         agent.isStopped = true;
+        StopWalkingSound();
         Debug.Log("Enemy stunned.");
 
         // Wait for the stun duration
@@ -141,5 +152,23 @@ public class EnemyAI : MonoBehaviour
 
         canBeStunned = true;
         Debug.Log("Enemy can be stunned again.");
+    }
+
+    void PlayWalkingSound()
+    {
+        if (!audioSource.isPlaying)
+        {
+            audioSource.clip = walkingSound;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
+    }
+
+    void StopWalkingSound()
+    {
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 }

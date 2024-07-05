@@ -29,17 +29,29 @@ public class ProximityTicking : MonoBehaviour
 
     IEnumerator FindGem()
     {
-        while (gem == null)
+        while (true)
         {
             gem = GameObject.FindGameObjectWithTag("gem");
             if (gem == null)
             {
-                Debug.Log("Gem not found. Retrying...");
+                if (isInRange)
+                {
+                    isInRange = false;
+                    if (tickingCoroutine != null)
+                    {
+                        StopCoroutine(tickingCoroutine);
+                        tickingCoroutine = null;
+                    }
+                }
                 yield return new WaitForSeconds(0.1f); // Check every 0.1 seconds
             }
             else
             {
-                Debug.Log("Gem found!");
+                if (tickingCoroutine == null && isInRange)
+                {
+                    tickingCoroutine = StartCoroutine(HandleTickingSound());
+                }
+                yield return new WaitForSeconds(0.1f); // Check every 0.1 seconds
             }
         }
     }
@@ -48,11 +60,18 @@ public class ProximityTicking : MonoBehaviour
     {
         if (gem == null)
         {
+            // If no gem is found, the ticking follows the player
+            float distance = 0f;
+            HandleTicking(distance);
             return;
         }
 
-        float distance = Vector3.Distance(transform.position, gem.transform.position);
+        float gemDistance = Vector3.Distance(transform.position, gem.transform.position);
+        HandleTicking(gemDistance);
+    }
 
+    void HandleTicking(float distance)
+    {
         if (distance <= detectionRange)
         {
             if (!isInRange)
@@ -62,7 +81,6 @@ public class ProximityTicking : MonoBehaviour
                 if (tickingCoroutine == null)
                 {
                     tickingCoroutine = StartCoroutine(HandleTickingSound());
-                    Debug.Log("Player entered detection range.");
                 }
             }
         }
@@ -76,7 +94,6 @@ public class ProximityTicking : MonoBehaviour
                 {
                     StopCoroutine(tickingCoroutine);
                     tickingCoroutine = null;
-                    Debug.Log("Player exited detection range.");
                 }
             }
         }
@@ -86,7 +103,7 @@ public class ProximityTicking : MonoBehaviour
     {
         while (isInRange)
         {
-            float distance = Vector3.Distance(transform.position, gem.transform.position);
+            float distance = gem != null ? Vector3.Distance(transform.position, gem.transform.position) : 0f;
             float t = Mathf.Clamp01(distance / detectionRange);
             float tickInterval = Mathf.Lerp(minTickInterval, maxTickInterval, Mathf.Log10(t + 1) / Mathf.Log10(2));
 

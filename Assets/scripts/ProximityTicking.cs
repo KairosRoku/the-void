@@ -8,6 +8,7 @@ public class ProximityTicking : MonoBehaviour
     public float maxTickInterval = 6.0f; // Maximum interval between ticks (farthest distance)
     public float minTickInterval = 0.5f; // Minimum interval between ticks (nearest distance)
     public float detectionRange = 10.0f; // Range within which the ticking occurs
+    public float initialDelay = 1.0f; // Initial delay before ticking starts
 
     private AudioSource audioSource;
     private Coroutine tickingCoroutine;
@@ -24,6 +25,12 @@ public class ProximityTicking : MonoBehaviour
             audioSource.playOnAwake = false;
         }
 
+        StartCoroutine(DelayedStart());
+    }
+
+    IEnumerator DelayedStart()
+    {
+        yield return new WaitForSeconds(initialDelay);
         StartCoroutine(FindGem());
     }
 

@@ -14,6 +14,7 @@ public class RaycastShoot : MonoBehaviour
     public float spreadAngle = 10f; // Maximum angle in degrees for bullet spread
     public float fireRate = 0.1f; // Time between shots in seconds
     public int maxMarks = 20; // Maximum number of marks
+    public int maxIterations = 10; // Maximum number of iterations for the loop
 
     private float nextTimeToShoot = 0f;
     private Queue<GameObject> marks = new Queue<GameObject>();
@@ -32,26 +33,42 @@ public class RaycastShoot : MonoBehaviour
         for (int i = 0; i < bulletCount; i++)
         {
             Vector3 shootDirection = GetRandomDirection();
-            RaycastHit hit;
-            if (Physics.Raycast(playerCamera.transform.position, shootDirection, out hit, range))
-            {
-                if (hit.collider.CompareTag("wall") ||
-                    hit.collider.CompareTag("enemy") ||
-                    hit.collider.CompareTag("furniture") ||
-                    hit.collider.CompareTag("interactable") ||
-                    hit.collider.CompareTag("gem"))
-                {
-                    CreateMark(hit.point, hit.normal, hit.collider.tag);
+            Vector3 currentPosition = playerCamera.transform.position;
+            int iterations = 0;
 
-                    if (hit.collider.CompareTag("enemy"))
+            while (iterations < maxIterations)
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(currentPosition, shootDirection, out hit, range))
+                {
+                    if (hit.collider.CompareTag("ignore"))
                     {
-                        EnemyAI enemyAI = hit.collider.GetComponentInParent<EnemyAI>();
-                        if (enemyAI != null)
+                        // Continue raycasting from the hit point onwards
+                        currentPosition = hit.point + shootDirection * 0.01f;
+                        iterations++;
+                        continue;
+                    }
+
+                    if (hit.collider.CompareTag("wall") ||
+                        hit.collider.CompareTag("enemy") ||
+                        hit.collider.CompareTag("furniture") ||
+                        hit.collider.CompareTag("interactable") ||
+                        hit.collider.CompareTag("gem"))
+                    {
+                        CreateMark(hit.point, hit.normal, hit.collider.tag);
+
+                        if (hit.collider.CompareTag("enemy"))
                         {
-                            enemyAI.HitByBullet();
+                            EnemyAI enemyAI = hit.collider.GetComponentInParent<EnemyAI>();
+                            if (enemyAI != null)
+                            {
+                                enemyAI.HitByBullet();
+                            }
                         }
+                        break; // Exit loop after marking the first valid hit
                     }
                 }
+                break; // Exit loop if no valid hit
             }
         }
     }

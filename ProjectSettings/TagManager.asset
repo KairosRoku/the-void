@@ -10,6 +10,7 @@ TagManager:
   - enemy
   - Bullet
   - gem
+  - ignore
   layers:
   - Default
   - TransparentFX

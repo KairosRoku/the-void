@@ -13,7 +13,9 @@ public class ProximityTicking : MonoBehaviour
     private AudioSource audioSource;
     private Coroutine tickingCoroutine;
     private bool isInRange = false;
-    public GameObject gem; // Make gem public
+    private bool gemAssigned = false;
+    private GameObject player;
+    public GameObject gem { get; private set; } // Make gem public with private set
 
     void Start()
     {
@@ -31,47 +33,48 @@ public class ProximityTicking : MonoBehaviour
     IEnumerator DelayedStart()
     {
         yield return new WaitForSeconds(initialDelay);
-        StartCoroutine(FindGem());
+        StartCoroutine(FindPlayerAndGem());
     }
 
-    IEnumerator FindGem()
+    IEnumerator FindPlayerAndGem()
     {
-        while (true)
+        while (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player");
+            yield return new WaitForSeconds(0.1f); // Check every 0.1 seconds
+        }
+
+        while (!gemAssigned)
         {
             gem = GameObject.FindGameObjectWithTag("gem");
-            if (gem == null)
+            if (gem != null)
             {
-                if (isInRange)
-                {
-                    isInRange = false;
-                    if (tickingCoroutine != null)
-                    {
-                        StopCoroutine(tickingCoroutine);
-                        tickingCoroutine = null;
-                    }
-                }
-                yield return new WaitForSeconds(0.1f); // Check every 0.1 seconds
+                gemAssigned = true;
+                StartTicking();
             }
-            else
-            {
-                if (tickingCoroutine == null && isInRange)
-                {
-                    tickingCoroutine = StartCoroutine(HandleTickingSound());
-                }
-                yield return new WaitForSeconds(0.1f); // Check every 0.1 seconds
-            }
+            yield return new WaitForSeconds(0.1f); // Check every 0.1 seconds
+        }
+    }
+
+    public void SetGem(GameObject newGem)
+    {
+        gem = newGem;
+        gemAssigned = true;
+        StartTicking();
+    }
+
+    void StartTicking()
+    {
+        if (gameObject.activeInHierarchy && tickingCoroutine == null)
+        {
+            tickingCoroutine = StartCoroutine(HandleTickingSound());
         }
     }
 
     void Update()
     {
-        if (gem == null)
-        {
-            // If no gem is found, the ticking follows the player
-            float distance = 0f;
-            HandleTicking(distance);
+        if (!gemAssigned)
             return;
-        }
 
         float gemDistance = Vector3.Distance(transform.position, gem.transform.position);
         HandleTicking(gemDistance);

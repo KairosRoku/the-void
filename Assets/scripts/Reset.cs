@@ -1,18 +1,20 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // If you're using Text, otherwise use TMPro if using TextMeshPro
+using UnityEngine.UI;
 
 public class Reset : MonoBehaviour
 {
     public GameObject youDiedText; // Assign in inspector
     public GameObject clickPromptText; // Assign in inspector
+    public Image blackScreen; // Assign in inspector
     private bool gamePaused = false;
 
     void Start()
     {
         youDiedText.SetActive(false);
         clickPromptText.SetActive(false);
+        blackScreen.gameObject.SetActive(false);
     }
 
     void Update()
@@ -41,6 +43,7 @@ public class Reset : MonoBehaviour
 
     IEnumerator ShowYouDiedMessage()
     {
+        blackScreen.gameObject.SetActive(true);
         youDiedText.SetActive(true);
         clickPromptText.SetActive(true);
 
@@ -50,17 +53,26 @@ public class Reset : MonoBehaviour
             canvasGroup = youDiedText.AddComponent<CanvasGroup>();
         }
 
+        CanvasGroup blackScreenCanvasGroup = blackScreen.GetComponent<CanvasGroup>();
+        if (blackScreenCanvasGroup == null)
+        {
+            blackScreenCanvasGroup = blackScreen.gameObject.AddComponent<CanvasGroup>();
+        }
+
         float fadeDuration = 1f;
         float elapsedTime = 0f;
 
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.unscaledDeltaTime;
-            canvasGroup.alpha = Mathf.Clamp01(elapsedTime / fadeDuration);
+            float alpha = Mathf.Clamp01(elapsedTime / fadeDuration);
+            canvasGroup.alpha = alpha;
+            blackScreenCanvasGroup.alpha = alpha;
             yield return null;
         }
 
         canvasGroup.alpha = 1f; // Ensure fully visible
+        blackScreenCanvasGroup.alpha = 1f; // Ensure fully visible
 
         clickPromptText.SetActive(true);
     }

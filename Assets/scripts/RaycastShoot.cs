@@ -9,6 +9,7 @@ public class RaycastShoot : MonoBehaviour
     public GameObject furnitureMarkPrefab;
     public GameObject interactableMarkPrefab;
     public GameObject gemMarkPrefab;
+    public GameObject returnMarkPrefab; // Prefab for the "return" tag
     public int bulletCount = 10;
     public float range = 100f;
     public float spreadAngle = 10f; // Maximum angle in degrees for bullet spread
@@ -53,7 +54,8 @@ public class RaycastShoot : MonoBehaviour
                         hit.collider.CompareTag("enemy") ||
                         hit.collider.CompareTag("furniture") ||
                         hit.collider.CompareTag("interactable") ||
-                        hit.collider.CompareTag("gem"))
+                        hit.collider.CompareTag("gem") ||
+                        hit.collider.CompareTag("return"))
                     {
                         CreateMark(hit.point, hit.normal, hit.collider.tag);
 
@@ -114,6 +116,9 @@ public class RaycastShoot : MonoBehaviour
                 break;
             case "gem":
                 markPrefab = gemMarkPrefab;
+                break;
+            case "return":
+                markPrefab = returnMarkPrefab;
                 break;
             default:
                 return; // Exit if the tag doesn't match any specified tags

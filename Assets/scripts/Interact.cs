@@ -7,6 +7,7 @@ public class Interact : MonoBehaviour
     public string interactableTag = "Interactable"; // Tag for interactable objects
     public string gemTag = "gem"; // Tag for gem objects
     public KeyCode interactionKey = KeyCode.E; // Key for interaction
+    public GameManager gameManager;
 
     private Camera playerCamera;
     private List<GameObject> inventory = new List<GameObject>();
@@ -14,6 +15,7 @@ public class Interact : MonoBehaviour
     void Start()
     {
         playerCamera = Camera.main;
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     void Update()
@@ -31,7 +33,7 @@ public class Interact : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, interactionRange))
         {
-            if (hit.collider.CompareTag(interactableTag) || hit.collider.CompareTag(gemTag))
+            if (hit.collider.CompareTag(interactableTag))
             {
                 Interactable interactable = hit.collider.GetComponent<Interactable>();
 
@@ -44,6 +46,16 @@ public class Interact : MonoBehaviour
                     }
                 }
             }
+            else if (hit.collider.CompareTag(gemTag))
+            {
+                Interactable interactable = hit.collider.GetComponent<Interactable>();
+
+                if (interactable != null)
+                {
+                    interactable.OnInteract();
+                    RemoveGem(interactable.gameObject);
+                }
+            }
         }
     }
 
@@ -52,5 +64,22 @@ public class Interact : MonoBehaviour
         inventory.Add(item);
         item.SetActive(false); // Hide the item
         Debug.Log("Item added to inventory: " + item.name);
+    }
+
+    void RemoveGem(GameObject gem)
+    {
+        Destroy(gem);
+        Debug.Log("Gem removed from scene: " + gem.name);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("Collision detected with: " + collision.gameObject.name);
+
+        if (collision.gameObject.CompareTag("return"))
+        {
+            Debug.Log("Player collided with return floor");
+            gameManager.CheckGameFinish();
+        }
     }
 }

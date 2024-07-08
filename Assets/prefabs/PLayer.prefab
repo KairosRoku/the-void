@@ -124,6 +124,7 @@ MonoBehaviour:
   furnitureMarkPrefab: {fileID: 6148285595876664364, guid: 3cba1aa941715ca47a65f358a248743d, type: 3}
   interactableMarkPrefab: {fileID: 6148285595876664364, guid: 5a0746b611591e546a6a33981b80f1d6, type: 3}
   gemMarkPrefab: {fileID: 6148285595876664364, guid: 5a0746b611591e546a6a33981b80f1d6, type: 3}
+  returnMarkPrefab: {fileID: 6148285595876664364, guid: 666c2a6a8d4fe4c4d9143a2564b7177a, type: 3}
   bulletCount: 100
   range: 100
   spreadAngle: 10
@@ -341,6 +342,7 @@ MonoBehaviour:
   interactableTag: interactable
   gemTag: gem
   interactionKey: 101
+  gameManager: {fileID: 0}
 --- !u!114 &2539022353427808770 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
@@ -477,7 +479,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2539022353427808776}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d3df1e9f5f077d4580dbb9f5a78be38, type: 3}
   m_Name: 

@@ -11,6 +11,7 @@ TagManager:
   - Bullet
   - gem
   - ignore
+  - return
   layers:
   - Default
   - TransparentFX

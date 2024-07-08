@@ -73,8 +73,20 @@ public class ProximityTicking : MonoBehaviour
 
     void Update()
     {
-        if (!gemAssigned)
+        if (gem == null)
+        {
+            gemAssigned = false;
+            if (isInRange)
+            {
+                isInRange = false;
+                if (tickingCoroutine != null)
+                {
+                    StopCoroutine(tickingCoroutine);
+                    tickingCoroutine = null;
+                }
+            }
             return;
+        }
 
         float gemDistance = Vector3.Distance(transform.position, gem.transform.position);
         HandleTicking(gemDistance);

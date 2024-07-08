@@ -1,7 +1,8 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class CollisionTest : MonoBehaviour
 {
     public bool gameFinished = false;
     private bool canTrigger = false;
@@ -17,7 +18,17 @@ public class GameManager : MonoBehaviour
         canTrigger = true;
     }
 
-    public void CheckGameFinish()
+    void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("CollisionTest: Collision detected with: " + collision.gameObject.name);
+
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            CheckGameFinish();
+        }
+    }
+
+    void CheckGameFinish()
     {
         if (!canTrigger)
             return;

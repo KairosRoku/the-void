@@ -73,23 +73,18 @@ public class ProximityTicking : MonoBehaviour
 
     void Update()
     {
-        if (gem == null)
-        {
-            gemAssigned = false;
-            if (isInRange)
-            {
-                isInRange = false;
-                if (tickingCoroutine != null)
-                {
-                    StopCoroutine(tickingCoroutine);
-                    tickingCoroutine = null;
-                }
-            }
+        if (!gemAssigned)
             return;
-        }
 
-        float gemDistance = Vector3.Distance(transform.position, gem.transform.position);
-        HandleTicking(gemDistance);
+        if (gem != null)
+        {
+            float gemDistance = Vector3.Distance(transform.position, gem.transform.position);
+            HandleTicking(gemDistance);
+        }
+        else
+        {
+            HandleTicking(0f); // Gem is destroyed, follow the player with max ticking
+        }
     }
 
     void HandleTicking(float distance)
@@ -123,7 +118,7 @@ public class ProximityTicking : MonoBehaviour
 
     IEnumerator HandleTickingSound()
     {
-        while (isInRange)
+        while (true)
         {
             float distance = gem != null ? Vector3.Distance(transform.position, gem.transform.position) : 0f;
             float t = Mathf.Clamp01(distance / detectionRange);

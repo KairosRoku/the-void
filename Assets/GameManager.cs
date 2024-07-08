@@ -1,49 +1,22 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class CollisionTest : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     public Text winText;
     public Text restartPrompt;
-    private bool canTrigger = false;
     private bool gameIsPaused = false;
 
     void Start()
-    {
-        StartCoroutine(AllowTriggerAfterDelay(3f));
-        InitializeUI();
-    }
-
-    IEnumerator AllowTriggerAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        canTrigger = true;
-    }
-
-    void InitializeUI()
     {
         if (winText != null) winText.gameObject.SetActive(false);
         if (restartPrompt != null) restartPrompt.gameObject.SetActive(false);
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("CollisionTest: Collision detected with: " + collision.gameObject.name);
-
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            CheckGameFinish();
-        }
-    }
-
-    // Use this existing CheckGameFinish method to avoid duplication
     public void CheckGameFinish()
     {
-        if (!canTrigger)
-            return;
-
+        // This method should be called by the CollisionTest script
         if (GameObject.FindGameObjectsWithTag("gem").Length == 0)
         {
             GameFinished();

@@ -471,7 +471,7 @@ MonoBehaviour:
   maxTickInterval: 0.7
   minTickInterval: 0.09
   detectionRange: 20
-  initialDelay: 0
+  initialDelay: 3
 --- !u!114 &-5333516023779800074
 MonoBehaviour:
   m_ObjectHideFlags: 0

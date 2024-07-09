@@ -17,6 +17,9 @@ using UnityEngine.UI;
 public class FirstPersonController : MonoBehaviour
 {
     private Rigidbody rb;
+    //added audio
+    public AudioSource audioSource;
+    public AudioClip stepSound;
 
     #region Camera Movement Variables
 
@@ -129,7 +132,7 @@ public class FirstPersonController : MonoBehaviour
     // Internal Variables
     private Vector3 jointOriginalPos;
     private float timer = 0;
-
+  
     #endregion
 
     private void Awake()
@@ -148,7 +151,14 @@ public class FirstPersonController : MonoBehaviour
             sprintRemaining = sprintDuration;
             sprintCooldownReset = sprintCooldown;
         }
+
+        // Initialize AudioSource
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
+
 
     void Start()
     {
@@ -364,6 +374,17 @@ public class FirstPersonController : MonoBehaviour
             HeadBob();
         }
     }
+    //added audio
+    private void PlaySteppingAudio()
+    {
+        // Check if audio is not playing
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(stepSound);
+        }
+    }
+
+
 
     void FixedUpdate()
     {
@@ -500,10 +521,10 @@ public class FirstPersonController : MonoBehaviour
 
     private void HeadBob()
     {
-        if(isWalking)
+        if (isWalking)
         {
             // Calculates HeadBob speed during sprint
-            if(isSprinting)
+            if (isSprinting)
             {
                 timer += Time.deltaTime * (bobSpeed + sprintSpeed);
             }
@@ -517,17 +538,21 @@ public class FirstPersonController : MonoBehaviour
             {
                 timer += Time.deltaTime * bobSpeed;
             }
+
             // Applies HeadBob movement
             joint.localPosition = new Vector3(jointOriginalPos.x + Mathf.Sin(timer) * bobAmount.x, jointOriginalPos.y + Mathf.Sin(timer) * bobAmount.y, jointOriginalPos.z + Mathf.Sin(timer) * bobAmount.z);
+
+            // Play stepping audio
+            PlaySteppingAudio();
         }
         else
         {
-            // Resets when play stops moving
+            // Resets when player stops moving
             timer = 0;
             joint.localPosition = new Vector3(Mathf.Lerp(joint.localPosition.x, jointOriginalPos.x, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.y, jointOriginalPos.y, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.z, jointOriginalPos.z, Time.deltaTime * bobSpeed));
         }
     }
-}
+
 
 
 
@@ -738,6 +763,6 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
-}
+}}
 
 #endif

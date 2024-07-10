@@ -16,9 +16,15 @@ public class RaycastShoot : MonoBehaviour
     public float fireRate = 0.1f; // Time between shots in seconds
     public int maxMarks = 20; // Maximum number of marks
     public int maxIterations = 10; // Maximum number of iterations for the loop
+    public float audioCooldown = 30f; // Cooldown period for playing audio
+    public AudioClip[] audioCues; // Array of audio clips
+    public AudioSource audioSource; // Audio source component
 
     private float nextTimeToShoot = 0f;
     private Queue<GameObject> marks = new Queue<GameObject>();
+    private Dictionary<Transform, float> lastTaggedTime = new Dictionary<Transform, float>(); // Dictionary to track last tagged time for enemies
+    private bool hasPlayedFirstAudio = false; // Indicates if the first audio cue has been played
+    private float lastAudioTime = 0f; // Last time an audio cue was played
 
     void Update()
     {
@@ -65,6 +71,14 @@ public class RaycastShoot : MonoBehaviour
                             if (enemyAI != null)
                             {
                                 enemyAI.HitByBullet();
+                            }
+
+                            // Check if the enemy can play the audio cue
+                            if (!lastTaggedTime.ContainsKey(hit.collider.transform) ||
+                                Time.time - lastTaggedTime[hit.collider.transform] >= audioCooldown)
+                            {
+                                PlayRandomAudioCue();
+                                lastTaggedTime[hit.collider.transform] = Time.time;
                             }
                         }
                         break; // Exit loop after marking the first valid hit
@@ -136,5 +150,20 @@ public class RaycastShoot : MonoBehaviour
         }
 
         Destroy(mark, 60f); // Destroy the mark after 60 seconds
+    }
+
+    void PlayRandomAudioCue()
+    {
+        // Play the audio cue if it's the first time or the cooldown period has passed
+        if (!hasPlayedFirstAudio || (hasPlayedFirstAudio && Time.time - lastAudioTime >= audioCooldown))
+        {
+            if (audioCues.Length > 0)
+            {
+                AudioClip randomClip = audioCues[Random.Range(0, audioCues.Length)];
+                audioSource.PlayOneShot(randomClip);
+                lastAudioTime = Time.time; // Update last audio play time
+                hasPlayedFirstAudio = true; // Set the flag to indicate the first audio has been played
+            }
+        }
     }
 }

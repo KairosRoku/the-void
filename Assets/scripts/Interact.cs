@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Interact : MonoBehaviour
 {
@@ -8,33 +9,69 @@ public class Interact : MonoBehaviour
     public string gemTag = "gem"; // Tag for gem objects
     public KeyCode interactionKey = KeyCode.E; // Key for interaction
 
-    private Camera playerCamera;
     private List<GameObject> inventory = new List<GameObject>();
+    private Transform playerTransform;
+
+    public TextMeshProUGUI interactPrompt; // Reference to the TextMeshProUGUI for the interaction prompt
+    public TextMeshProUGUI returnPrompt; // Reference to the TextMeshProUGUI for the return prompt
+    private bool isNearInteractable = false; // Track if the player is near an interactable object
 
     void Start()
     {
-        playerCamera = Camera.main;
+        playerTransform = GetComponent<Transform>();
+        if (interactPrompt != null)
+        {
+            SetPromptAlpha(interactPrompt, 0); // Ensure the prompt is invisible at the start
+        }
+        if (returnPrompt != null)
+        {
+            SetPromptAlpha(returnPrompt, 0); // Ensure the return prompt is invisible at the start
+        }
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(interactionKey))
+        CheckForNearbyObjects();
+
+        if (isNearInteractable && Input.GetKeyDown(interactionKey))
         {
-            InteractWithObject();
+            InteractWithNearbyObjects();
         }
     }
 
-    void InteractWithObject()
+    void CheckForNearbyObjects()
     {
-        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
+        Collider[] hitColliders = Physics.OverlapSphere(playerTransform.position, interactionRange);
+        isNearInteractable = false;
 
-        if (Physics.Raycast(ray, out hit, interactionRange))
+        foreach (Collider hitCollider in hitColliders)
         {
-            if (hit.collider.CompareTag(interactableTag))
+            if (hitCollider.CompareTag(interactableTag) || hitCollider.CompareTag(gemTag))
             {
-                Interactable interactable = hit.collider.GetComponent<Interactable>();
+                isNearInteractable = true;
+                break;
+            }
+        }
 
+        // Fade in/out the interact prompt
+        if (isNearInteractable)
+        {
+            FadeInPrompt(interactPrompt);
+        }
+        else
+        {
+            FadeOutPrompt(interactPrompt);
+        }
+    }
+
+    void InteractWithNearbyObjects()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(playerTransform.position, interactionRange);
+        foreach (Collider hitCollider in hitColliders)
+        {
+            if (hitCollider.CompareTag(interactableTag))
+            {
+                Interactable interactable = hitCollider.GetComponent<Interactable>();
                 if (interactable != null)
                 {
                     interactable.OnInteract();
@@ -44,14 +81,14 @@ public class Interact : MonoBehaviour
                     }
                 }
             }
-            else if (hit.collider.CompareTag(gemTag))
+            else if (hitCollider.CompareTag(gemTag))
             {
-                Interactable interactable = hit.collider.GetComponent<Interactable>();
-
+                Interactable interactable = hitCollider.GetComponent<Interactable>();
                 if (interactable != null)
                 {
                     interactable.OnInteract();
                     StartCoroutine(RemoveGemAfterSound(interactable.gameObject));
+                    StartCoroutine(DisplayReturnPrompt());
                 }
             }
         }
@@ -66,6 +103,12 @@ public class Interact : MonoBehaviour
 
     System.Collections.IEnumerator RemoveGemAfterSound(GameObject gem)
     {
+        Collider gemCollider = gem.GetComponent<Collider>();
+        if (gemCollider != null)
+        {
+            gemCollider.enabled = false; // Disable the collider to prevent further interaction
+        }
+
         AudioSource audioSource = gem.GetComponent<AudioSource>();
         Interactable interactable = gem.GetComponent<Interactable>();
         if (audioSource != null && interactable != null && interactable.interactionSound != null)
@@ -75,5 +118,58 @@ public class Interact : MonoBehaviour
         }
         Destroy(gem);
         Debug.Log("Gem removed from scene: " + gem.name);
+    }
+
+    System.Collections.IEnumerator DisplayReturnPrompt()
+    {
+        if (returnPrompt != null)
+        {
+            // Fade in
+            float duration = 1f;
+            float targetAlpha = 1f;
+            for (float t = 0.01f; t < duration; t += Time.deltaTime)
+            {
+                SetPromptAlpha(returnPrompt, Mathf.Lerp(0, targetAlpha, Mathf.Min(1, t / duration)));
+                yield return null;
+            }
+            SetPromptAlpha(returnPrompt, targetAlpha);
+
+            // Wait for 2 seconds
+            yield return new WaitForSeconds(2f);
+
+            // Fade out
+            for (float t = 0.01f; t < duration; t += Time.deltaTime)
+            {
+                SetPromptAlpha(returnPrompt, Mathf.Lerp(targetAlpha, 0, Mathf.Min(1, t / duration)));
+                yield return null;
+            }
+            SetPromptAlpha(returnPrompt, 0);
+        }
+    }
+
+    void FadeInPrompt(TextMeshProUGUI prompt)
+    {
+        if (prompt != null)
+        {
+            SetPromptAlpha(prompt, Mathf.Lerp(prompt.color.a, 1, Time.deltaTime * 2)); // Adjust the fade speed as needed
+        }
+    }
+
+    void FadeOutPrompt(TextMeshProUGUI prompt)
+    {
+        if (prompt != null)
+        {
+            SetPromptAlpha(prompt, Mathf.Lerp(prompt.color.a, 0, Time.deltaTime * 2)); // Adjust the fade speed as needed
+        }
+    }
+
+    void SetPromptAlpha(TextMeshProUGUI prompt, float alpha)
+    {
+        if (prompt != null)
+        {
+            Color color = prompt.color;
+            color.a = alpha;
+            prompt.color = color;
+        }
     }
 }

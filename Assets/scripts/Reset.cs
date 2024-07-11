@@ -8,6 +8,7 @@ public class Reset : MonoBehaviour
     public GameObject youDiedText; // Assign in inspector
     public GameObject clickPromptText; // Assign in inspector
     public Image blackScreen; // Assign in inspector
+    public AudioSource deathAudioSource; // Assign in inspector
     private bool gamePaused = false;
 
     void Start()
@@ -31,7 +32,8 @@ public class Reset : MonoBehaviour
         {
             Debug.Log("Player hit the reset trigger");
             PauseGame();
-            StartCoroutine(ShowYouDiedMessage());
+            PlayDeathAudio();
+            StartCoroutine(ShowDeathUI());
         }
     }
 
@@ -41,16 +43,30 @@ public class Reset : MonoBehaviour
         gamePaused = true;
     }
 
-    IEnumerator ShowYouDiedMessage()
+    void PlayDeathAudio()
+    {
+        if (deathAudioSource != null)
+        {
+            deathAudioSource.Play();
+        }
+    }
+
+    IEnumerator ShowDeathUI()
     {
         blackScreen.gameObject.SetActive(true);
         youDiedText.SetActive(true);
         clickPromptText.SetActive(true);
 
-        CanvasGroup canvasGroup = youDiedText.GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
+        CanvasGroup youDiedCanvasGroup = youDiedText.GetComponent<CanvasGroup>();
+        if (youDiedCanvasGroup == null)
         {
-            canvasGroup = youDiedText.AddComponent<CanvasGroup>();
+            youDiedCanvasGroup = youDiedText.AddComponent<CanvasGroup>();
+        }
+
+        CanvasGroup clickPromptCanvasGroup = clickPromptText.GetComponent<CanvasGroup>();
+        if (clickPromptCanvasGroup == null)
+        {
+            clickPromptCanvasGroup = clickPromptText.AddComponent<CanvasGroup>();
         }
 
         CanvasGroup blackScreenCanvasGroup = blackScreen.GetComponent<CanvasGroup>();
@@ -66,14 +82,14 @@ public class Reset : MonoBehaviour
         {
             elapsedTime += Time.unscaledDeltaTime;
             float alpha = Mathf.Clamp01(elapsedTime / fadeDuration);
-            canvasGroup.alpha = alpha;
+            youDiedCanvasGroup.alpha = alpha;
+            clickPromptCanvasGroup.alpha = alpha;
             blackScreenCanvasGroup.alpha = alpha;
             yield return null;
         }
 
-        canvasGroup.alpha = 1f; // Ensure fully visible
+        youDiedCanvasGroup.alpha = 1f; // Ensure fully visible
+        clickPromptCanvasGroup.alpha = 1f; // Ensure fully visible
         blackScreenCanvasGroup.alpha = 1f; // Ensure fully visible
-
-        clickPromptText.SetActive(true);
     }
 }

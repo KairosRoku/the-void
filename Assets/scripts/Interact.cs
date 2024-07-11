@@ -51,7 +51,7 @@ public class Interact : MonoBehaviour
                 if (interactable != null)
                 {
                     interactable.OnInteract();
-                    RemoveGem(interactable.gameObject);
+                    StartCoroutine(RemoveGemAfterSound(interactable.gameObject));
                 }
             }
         }
@@ -64,8 +64,15 @@ public class Interact : MonoBehaviour
         Debug.Log("Item added to inventory: " + item.name);
     }
 
-    void RemoveGem(GameObject gem)
+    System.Collections.IEnumerator RemoveGemAfterSound(GameObject gem)
     {
+        AudioSource audioSource = gem.GetComponent<AudioSource>();
+        Interactable interactable = gem.GetComponent<Interactable>();
+        if (audioSource != null && interactable != null && interactable.interactionSound != null)
+        {
+            audioSource.PlayOneShot(interactable.interactionSound);
+            yield return new WaitForSeconds(interactable.interactionSound.length);
+        }
         Destroy(gem);
         Debug.Log("Gem removed from scene: " + gem.name);
     }

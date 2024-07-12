@@ -10,6 +10,7 @@ public class Reset : MonoBehaviour
     public Image blackScreen; // Assign in inspector
     public AudioSource deathAudioSource; // Assign in inspector
     private bool gamePaused = false;
+    private bool canReset = false;
 
     void Start()
     {
@@ -20,9 +21,9 @@ public class Reset : MonoBehaviour
 
     void Update()
     {
-        if (gamePaused && Input.GetMouseButtonDown(0))
+        if (canReset && Input.GetMouseButtonDown(0))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            ReloadScene();
         }
     }
 
@@ -91,5 +92,13 @@ public class Reset : MonoBehaviour
         youDiedCanvasGroup.alpha = 1f; // Ensure fully visible
         clickPromptCanvasGroup.alpha = 1f; // Ensure fully visible
         blackScreenCanvasGroup.alpha = 1f; // Ensure fully visible
+
+        canReset = true; // Enable scene reset on click
+    }
+
+    void ReloadScene()
+    {
+        Time.timeScale = 1f; // Ensure time scale is reset before reloading the scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

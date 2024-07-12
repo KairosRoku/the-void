@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -14,6 +15,7 @@ public class Interact : MonoBehaviour
 
     public TextMeshProUGUI interactPrompt; // Reference to the TextMeshProUGUI for the interaction prompt
     public TextMeshProUGUI returnPrompt; // Reference to the TextMeshProUGUI for the return prompt
+    public TextMeshProUGUI startPrompt; // Reference to the TextMeshProUGUI for the start prompt
     private bool isNearInteractable = false; // Track if the player is near an interactable object
 
     void Start()
@@ -26,6 +28,11 @@ public class Interact : MonoBehaviour
         if (returnPrompt != null)
         {
             SetPromptAlpha(returnPrompt, 0); // Ensure the return prompt is invisible at the start
+        }
+        if (startPrompt != null)
+        {
+            SetPromptAlpha(startPrompt, 0); // Ensure the start prompt is invisible at the start
+            StartCoroutine(DisplayStartPrompt());
         }
     }
 
@@ -101,7 +108,7 @@ public class Interact : MonoBehaviour
         Debug.Log("Item added to inventory: " + item.name);
     }
 
-    System.Collections.IEnumerator RemoveGemAfterSound(GameObject gem)
+    IEnumerator RemoveGemAfterSound(GameObject gem)
     {
         Collider gemCollider = gem.GetComponent<Collider>();
         if (gemCollider != null)
@@ -120,7 +127,7 @@ public class Interact : MonoBehaviour
         Debug.Log("Gem removed from scene: " + gem.name);
     }
 
-    System.Collections.IEnumerator DisplayReturnPrompt()
+    IEnumerator DisplayReturnPrompt()
     {
         if (returnPrompt != null)
         {
@@ -144,6 +151,33 @@ public class Interact : MonoBehaviour
                 yield return null;
             }
             SetPromptAlpha(returnPrompt, 0);
+        }
+    }
+
+    IEnumerator DisplayStartPrompt()
+    {
+        if (startPrompt != null)
+        {
+            // Fade in
+            float duration = 1f;
+            float targetAlpha = 1f;
+            for (float t = 0.01f; t < duration; t += Time.deltaTime)
+            {
+                SetPromptAlpha(startPrompt, Mathf.Lerp(0, targetAlpha, Mathf.Min(1, t / duration)));
+                yield return null;
+            }
+            SetPromptAlpha(startPrompt, targetAlpha);
+
+            // Wait for 2 seconds
+            yield return new WaitForSeconds(2f);
+
+            // Fade out
+            for (float t = 0.01f; t < duration; t += Time.deltaTime)
+            {
+                SetPromptAlpha(startPrompt, Mathf.Lerp(targetAlpha, 0, Mathf.Min(1, t / duration)));
+                yield return null;
+            }
+            SetPromptAlpha(startPrompt, 0);
         }
     }
 

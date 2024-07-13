@@ -6128,6 +6128,8 @@ MonoBehaviour:
   wanderRadius: 20
   wanderTimer: 5
   walkingSound: {fileID: 8300000, guid: 1b2f8f66dc5f5414fb0d5e194685057d, type: 3}
+  audioCues: []
+  hitsRequiredForAudio: 10
 --- !u!195 &1148834524
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -8192,7 +8194,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'version: 1.0'
+  m_text: 'version: 1.1'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10043,8 +10045,6 @@ GameObject:
   - component: {fileID: 1894820409}
   - component: {fileID: 1894820411}
   - component: {fileID: 1894820412}
-  - component: {fileID: 1894820413}
-  - component: {fileID: 1894820414}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -10064,6 +10064,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1ea6cc19d9c76041a6916cf26a14662, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ambienceClip: {fileID: 8300000, guid: b1696c90a13e039498a3449d97b4d737, type: 3}
+  volume: 0.2
 --- !u!4 &1894820410
 Transform:
   m_ObjectHideFlags: 0
@@ -10115,37 +10117,6 @@ MonoBehaviour:
   - {fileID: 406642812}
   - {fileID: 245682765}
   gemPrefab: {fileID: 7535266119704928820, guid: 8555c55f9670b7246b28b2a68c6aa235, type: 3}
---- !u!114 &1894820413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1894820408}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1afb8da9b62c3ab4bb606e2ac1fa7010, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isPickup: 1
-  isDoor: 0
-  interactionSound: {fileID: 0}
-  doorOpenSound: {fileID: 0}
-  doorCloseSound: {fileID: 0}
---- !u!114 &1894820414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1894820408}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e538f15454caec6429b961991a51f3b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ambienceClip: {fileID: 8300000, guid: b1696c90a13e039498a3449d97b4d737, type: 3}
-  volume: 0.2
 --- !u!1 &1900045403 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8605269197716647720, guid: beef3bcde1610f04aa96275436147bb9, type: 3}

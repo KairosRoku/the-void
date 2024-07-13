@@ -10,6 +10,8 @@ public class EnemyAI : MonoBehaviour
     public float wanderRadius = 20.0f;
     public float wanderTimer = 5.0f;
     public AudioClip walkingSound;
+    public AudioClip[] audioCues; // Array of audio clips
+    public int hitsRequiredForAudio = 10; // Number of hits required to play audio
 
     private NavMeshAgent agent;
     private Transform player;
@@ -19,6 +21,7 @@ public class EnemyAI : MonoBehaviour
     private bool canBeStunned = true;
     private bool isWandering = true;
     private float timer;
+    private int hitCount = 0; // Hit counter
 
     void Start()
     {
@@ -91,6 +94,16 @@ public class EnemyAI : MonoBehaviour
         if (canBeStunned)
         {
             StartCoroutine(StunEnemy());
+        }
+
+        // Increment the hit count
+        hitCount++;
+
+        // Check if the enemy has reached the required number of hits to play the audio cue
+        if (hitCount >= hitsRequiredForAudio)
+        {
+            PlayRandomAudioCue();
+            hitCount = 0; // Reset the hit count after playing the audio cue
         }
     }
 
@@ -169,6 +182,16 @@ public class EnemyAI : MonoBehaviour
         if (audioSource.isPlaying)
         {
             audioSource.Stop();
+        }
+    }
+
+    void PlayRandomAudioCue()
+    {
+        if (audioCues.Length > 0)
+        {
+            AudioClip randomClip = audioCues[Random.Range(0, audioCues.Length)];
+            audioSource.PlayOneShot(randomClip);
+            Debug.Log("Playing random audio cue.");
         }
     }
 }

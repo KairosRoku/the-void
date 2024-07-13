@@ -739,7 +739,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2539022353427808776}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 28112cf9c9211f44c91ad96d08926c5e, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1371,6 +1371,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 114f89424fe9a664283f1aeb252eefc0, type: 3}
   - {fileID: 8300000, guid: 703b5d4edba1c9243a16d8c8c9c64600, type: 3}
   audioSource: {fileID: 1564282932979014770}
+  hitsRequiredForAudio: 5
 --- !u!82 &1564282932979014770
 AudioSource:
   m_ObjectHideFlags: 0
